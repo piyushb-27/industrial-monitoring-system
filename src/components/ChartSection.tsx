@@ -28,7 +28,7 @@ export default function ChartSection({ data }: ChartSectionProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 w-full h-[500px]">
+      <div className="flex flex-col gap-6 w-full h-[600px] md:h-[500px]">
         {/* Temperature Chart */}
         <div className="flex-1 w-full relative chart-grid border border-outline-variant/5">
           <div className="absolute top-2 left-6 z-10 flex items-center gap-2">

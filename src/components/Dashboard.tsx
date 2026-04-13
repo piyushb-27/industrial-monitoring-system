@@ -112,28 +112,29 @@ export default function Dashboard() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 bg-[#0c0e10] flex justify-between items-center px-8 h-16 border-b border-outline-variant/10">
-        <div className="flex items-center gap-8">
-          <span className="text-xl font-bold tracking-tighter text-[#00daf3] font-space">
-            INDUSTRIAL SAFETY MONITORING SYSTEM
+      <nav className="fixed top-0 w-full z-50 bg-[#0c0e10] flex justify-between items-center px-4 md:px-8 h-16 border-b border-outline-variant/10">
+        <div className="flex items-center gap-4 md:gap-8 truncate mr-2">
+          <span className="text-sm md:text-xl font-bold tracking-tighter text-[#00daf3] font-space truncate">
+            <span className="hidden sm:inline">INDUSTRIAL SAFETY MONITORING SYSTEM</span>
+            <span className="sm:hidden">SAFETY MONITOR</span>
           </span>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1 bg-surface-container rounded-lg border border-outline-variant/20">
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 px-2 md:px-3 py-1 bg-surface-container rounded-lg border border-outline-variant/20">
             <span className={`w-2 h-2 rounded-full ${state.connected ? 'bg-primary animate-pulse' : 'bg-error'}`}></span>
-            <span className={`text-[10px] font-bold ${state.connected ? 'text-primary' : 'text-error'} font-space tracking-widest uppercase`}>
+            <span className={`hidden md:inline text-[10px] font-bold ${state.connected ? 'text-primary' : 'text-error'} font-space tracking-widest uppercase`}>
               {state.connected ? 'Connected to ThingSpeak' : 'Disconnected'}
             </span>
           </div>
           <img 
             alt="Operator" 
-            className="w-8 h-8 rounded-full border border-primary/30" 
+            className="w-7 h-7 md:w-8 md:h-8 rounded-full border border-primary/30" 
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRJZsbMl-VeZy03kEwgp4hw6oJKaX9wF-7pj1yrcYfQpmSerg7p1REbS81fVIGJbjIwN1IPKdajpzKsd-gX4bKRrn8qSLBOG6awsyK1_x5rJrC59F2veCmAvuSQZLPtOPLsfSDThbsYyHJWuz36xVSk4h7JqUrJ02d0GX_HdK9Mjk23-F_0ZnRIInVdeaIWSxcVnkMtKDMWa6xQUPTk2m88zkcgtiEXaDoDBW_JX-ZwINzky1-dCOSA5BkPPbZKs_ue9oyqPE-AAsG"
           />
         </div>
       </nav>
 
-      <main className="mt-16 p-8 max-w-7xl mx-auto space-y-6">
+      <main className="mt-16 px-4 py-6 md:p-8 max-w-7xl mx-auto space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <StatusPanel status={state.status} riskFactor={riskFactor} />
           
