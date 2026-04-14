@@ -4,7 +4,6 @@ import { PlatformState, TelemetryData, StatusLevel } from '@/lib/types';
 import StatusPanel from './StatusPanel';
 import SensorCard from './SensorCard';
 import ChartSection from './ChartSection';
-import IncidentPanel from './IncidentPanel';
 
 export default function Dashboard() {
   const [state, setState] = useState<PlatformState>({
@@ -110,41 +109,71 @@ export default function Dashboard() {
   // Compute risk factor out of 100 (assuming 3000 gas as absolute max risk, adjust as needed)
   const riskFactor = Math.min((state.gas / 3000) * 100, 100);
 
+  const dashboardRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (dashboardRef.current) {
+      const rect = dashboardRef.current.getBoundingClientRect();
+      dashboardRef.current.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+      dashboardRef.current.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+    }
+  };
+
   return (
-    <>
-      <nav className="fixed top-0 w-full z-50 bg-[#0c0e10] flex justify-between items-center px-4 md:px-8 h-16 border-b border-outline-variant/10">
-        <div className="flex items-center gap-4 md:gap-8 truncate mr-2">
-          <span className="text-sm md:text-xl font-bold tracking-tighter text-[#00daf3] font-space truncate">
+    <div 
+      ref={dashboardRef}
+      onMouseMove={handleMouseMove}
+      className="min-h-screen bg-[#13171a] relative overflow-hidden"
+    >
+      {/* Interactive Hover Glow Background */}
+      <div 
+        className="pointer-events-none absolute inset-0 z-0 opacity-80"
+        style={{
+          background: 'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, -20%), rgba(0, 218, 243, 0.25), transparent 40%)'
+        }}
+      />
+
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 glass-panel rounded-2xl flex justify-between items-center px-4 md:px-8 h-16 transition-all duration-300">
+        <div className="flex items-center gap-4 md:gap-8 mr-2 group">
+          <span className="text-sm md:text-xl font-bold tracking-tighter text-primary font-space">
             <span className="hidden sm:inline">INDUSTRIAL SAFETY MONITORING SYSTEM</span>
             <span className="sm:hidden">SAFETY MONITOR</span>
           </span>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <div className="flex items-center gap-2 px-2 md:px-3 py-1 bg-surface-container rounded-lg border border-outline-variant/20">
-            <span className={`w-2 h-2 rounded-full ${state.connected ? 'bg-primary animate-pulse' : 'bg-error'}`}></span>
-            <span className={`hidden md:inline text-[10px] font-bold ${state.connected ? 'text-primary' : 'text-error'} font-space tracking-widest uppercase`}>
-              {state.connected ? 'Connected to ThingSpeak' : 'Disconnected'}
+          <button 
+            onClick={() => triggerAlert("MANUAL EMERGENCY OVERRIDE INITIATED", true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-black text-[10px] tracking-widest rounded-xl transition-all shadow-[0_4px_10px_rgba(220,38,38,0.4)] hover:shadow-[0_0_25px_rgba(239,68,68,0.9)] group"
+          >
+            <span className="material-symbols-outlined text-sm">campaign</span>
+            <span className="hidden md:inline transition-all">EMERGENCY ALERT</span>
+          </button>
+          
+          <div className="hidden md:flex items-center gap-2 px-3 justify-center py-1.5 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 shadow-inner group">
+            <span className={`w-2 h-2 rounded-full ${state.connected ? 'bg-primary shadow-[0_0_10px_#00daf3] animate-pulse' : 'bg-error shadow-[0_0_10px_#ee7d77]'}`}></span>
+            <span className={`text-[10px] font-bold ${state.connected ? 'text-primary' : 'text-error'} font-space tracking-widest uppercase transition-all`}>
+              {state.connected ? 'LIVE CONNECTION' : 'DISCONNECTED'}
             </span>
           </div>
           <img 
             alt="Operator" 
-            className="w-7 h-7 md:w-8 md:h-8 rounded-full border border-primary/30" 
+            className="w-8 h-8 rounded-full border-2 border-primary/40 shadow-[0_0_15px_rgba(0,218,243,0.3)] hover:shadow-[0_0_25px_rgba(0,218,243,0.8)] transition-all" 
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRJZsbMl-VeZy03kEwgp4hw6oJKaX9wF-7pj1yrcYfQpmSerg7p1REbS81fVIGJbjIwN1IPKdajpzKsd-gX4bKRrn8qSLBOG6awsyK1_x5rJrC59F2veCmAvuSQZLPtOPLsfSDThbsYyHJWuz36xVSk4h7JqUrJ02d0GX_HdK9Mjk23-F_0ZnRIInVdeaIWSxcVnkMtKDMWa6xQUPTk2m88zkcgtiEXaDoDBW_JX-ZwINzky1-dCOSA5BkPPbZKs_ue9oyqPE-AAsG"
           />
         </div>
       </nav>
 
-      <main className="mt-16 px-4 py-6 md:p-8 max-w-7xl mx-auto space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <main className="relative z-10 pt-28 px-4 pb-12 md:px-8 max-w-7xl mx-auto space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
           <StatusPanel status={state.status} riskFactor={riskFactor} />
           
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 h-full">
             <SensorCard 
               title="Temperature"
               icon="thermostat"
               value={state.temperature.toFixed(1)}
               unit="°C"
-              iconColorClass="text-primary-dim"
+              iconColorClass="text-primary"
             />
             <SensorCard 
               title="Humidity"
@@ -159,22 +188,21 @@ export default function Dashboard() {
               value={state.gas.toFixed(0)}
               unit=""
               iconColorClass={state.status === 'SAFE' ? 'text-secondary' : state.status === 'WARNING' ? 'text-secondary' : 'text-error'}
-              borderColorClass={`border-b-2 ${state.status === 'SAFE' ? 'border-secondary' : state.status === 'WARNING' ? 'border-secondary' : 'border-error'} bg-surface-container`}
+              borderColorClass={state.status === 'SAFE' ? 'border-secondary/30' : state.status === 'WARNING' ? 'border-secondary' : 'border-error shadow-[0_0_20px_rgba(238,125,119,0.3)]'}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:gap-8">
           <ChartSection data={state.feeds} />
-          <IncidentPanel onManualAlert={() => triggerAlert("MANUAL EMERGENCY OVERRIDE INITIATED", true)} />
         </div>
         
         {state.lastUpdated && (
-          <div className="text-right text-[10px] text-on-surface-variant/50 uppercase tracking-widest mt-4">
-            Last Updated: {new Date(state.lastUpdated).toLocaleString()}
+          <div className="text-right text-xs text-on-surface-variant/40 font-bold uppercase tracking-widest mt-4">
+            Last Updated: <span className="text-primary/70">{new Date(state.lastUpdated).toLocaleString()}</span>
           </div>
         )}
       </main>
-    </>
+    </div>
   );
 }
