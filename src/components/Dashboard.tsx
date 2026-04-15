@@ -72,7 +72,7 @@ export default function Dashboard() {
         if (gasLvl > 2400 || temp > 70) {
           newStatus = 'CRITICAL';
           triggerAlert(`Threshold exceeded! Temp: ${temp} C, Gas: ${gasLvl}`);
-        } else if (gasLvl > 1800 || temp > 50) {
+        } else if (gasLvl > 1100 || temp > 50) {
           newStatus = 'WARNING';
         }
 
